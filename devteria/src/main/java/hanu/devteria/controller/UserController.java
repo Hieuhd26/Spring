@@ -8,14 +8,16 @@ import hanu.devteria.dto.response.UserResponse;
 import hanu.devteria.model.User;
 import hanu.devteria.service.UserService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UserController {
 
     private UserService userService;
@@ -34,12 +36,24 @@ public class UserController {
 
     @GetMapping()
     public List<User> getAllUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("Username: ", authentication.getName());
+        authentication.getAuthorities().forEach(e -> log.info(e.getAuthority()));
+
         return userService.findAllUser();
     }
 
     @GetMapping("/{userId}")
     public UserResponse getUserById(@PathVariable("userId") int id) {
         return userService.findUserById(id);
+    }
+
+    @GetMapping("/myInfor")
+    public ApiResponse<UserResponse> getMyInfor() {
+    return ApiResponse.<UserResponse>builder()
+            .result(userService.getInfor())
+            .build();
+
     }
 
     @PutMapping("/{userId}")

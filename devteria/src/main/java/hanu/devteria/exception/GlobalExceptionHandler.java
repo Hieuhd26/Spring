@@ -2,6 +2,7 @@ package hanu.devteria.exception;
 
 import hanu.devteria.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -23,7 +24,8 @@ public class GlobalExceptionHandler {
         ApiResponse response = new ApiResponse();
         response.setCode(errorCode.getCode());
         response.setMessage(errorCode.getMessage());
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(response);
     }
 
 
@@ -45,5 +47,15 @@ public class GlobalExceptionHandler {
         response.setMessage(errorCode.getMessage());
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ApiResponse> handlingAccessDeniedException(AccessDeniedException ex) {
+        ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build());
     }
 }
