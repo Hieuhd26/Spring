@@ -14,7 +14,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {// spring sẽ inject exception vào parameter này => mình có thể lấy thông tin exception
         ApiResponse response = new ApiResponse();
         response.setCode(ErrorCode.UNCATEGOIED_EXCEPTION.getCode());
-        response.setMessage(ErrorCode.UNCATEGOIED_EXCEPTION.getMessage());
+        //response.setMessage(ErrorCode.UNCATEGOIED_EXCEPTION.getMessage());
+        response.setMessage(exception.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 

@@ -9,9 +9,6 @@ import hanu.devteria.exception.ErrorCode;
 import hanu.devteria.mapper.UserMapper;
 import hanu.devteria.model.User;
 import hanu.devteria.repository.UserRepository;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,7 +46,7 @@ public class UserService {
         User user = userMapper.toUser(request);
         HashSet<String> roles = new HashSet<>();
         roles.add(Role.USER.name());
-        user.setRoles(roles);
+ //       user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         userRepository.save(user);
         return user;
