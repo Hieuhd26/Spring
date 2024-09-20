@@ -2,12 +2,14 @@ package hanu.devteria.service;
 
 import hanu.devteria.dto.request.UserCreationRequest;
 import hanu.devteria.dto.request.UserUpdateRequest;
+import hanu.devteria.dto.response.RoleResponse;
 import hanu.devteria.dto.response.UserResponse;
 import hanu.devteria.enums.Role;
 import hanu.devteria.exception.AppException;
 import hanu.devteria.exception.ErrorCode;
 import hanu.devteria.mapper.UserMapper;
 import hanu.devteria.model.User;
+import hanu.devteria.repository.RoleRepository;
 import hanu.devteria.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -29,12 +31,14 @@ public class UserService {
 
     private UserMapper userMapper;
     private PasswordEncoder passwordEncoder;
+    private RoleRepository roleRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepository=roleRepository;
     }
 
     public User createUser(UserCreationRequest request) {
@@ -54,7 +58,8 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('ADMIN')") // tao aop boc ben ngoai
-    // kiem tra role roi moi kiem tra
+  // @PreAuthorize("hasRole('fly')")
+   // kiem tra role roi moi kiem tra
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
@@ -70,6 +75,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User with id " + id + " not found"));
         userMapper.updateUser(user, request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        var roles = roleRepository.findAllById(request.getRoles());
+        user.setRoles(new HashSet<>(roles));
         userRepository.save(user);
         return userMapper.toUserResponse(user);
     }

@@ -1,5 +1,6 @@
 package hanu.devteria.dto.request;
 
+import hanu.devteria.validator.DobConstraint;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -17,5 +18,7 @@ public class UserCreationRequest {
     String email;
     @Size(min = 8,message = "PASSWORD_INVALID")
     String password;
+
+    @DobConstraint(min = 16, message = "INVALID_DOB")
     LocalDate dob;
 }

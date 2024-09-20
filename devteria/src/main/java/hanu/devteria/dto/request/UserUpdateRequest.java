@@ -1,9 +1,11 @@
 package hanu.devteria.dto.request;
 
+import hanu.devteria.validator.DobConstraint;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -12,6 +14,9 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdateRequest {
     String email;
+    String name;
     String password;
+    @DobConstraint(min = 18, message = "INVALID_DOB")
     LocalDate dob;
+    List<String> roles;
 }
