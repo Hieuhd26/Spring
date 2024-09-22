@@ -3,6 +3,8 @@ package hanu.devteria.controller;
 import com.nimbusds.jose.JOSEException;
 import hanu.devteria.dto.request.AuthenticationRequest;
 import hanu.devteria.dto.request.IntrospecRequest;
+import hanu.devteria.dto.request.LogoutRequest;
+import hanu.devteria.dto.request.RefreshRequest;
 import hanu.devteria.dto.response.ApiResponse;
 import hanu.devteria.dto.response.AuthenticationResponse;
 import hanu.devteria.dto.response.IntrospecResponse;
@@ -37,6 +39,22 @@ public class AuthenticationController {
     ApiResponse<IntrospecResponse> authenticate(@RequestBody IntrospecRequest request) throws ParseException, JOSEException {
         var result = authenticationService.introspect(request);
         return ApiResponse.<IntrospecResponse>builder()
+                .result(result)
+                .build();
+
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+
+    }
+    @PostMapping("/refresh")
+    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws ParseException, JOSEException {
+        var result = authenticationService.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
                 .result(result)
                 .build();
 

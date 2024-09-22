@@ -1,6 +1,7 @@
 package hanu.devteria.config;
 
 import hanu.devteria.enums.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +25,12 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableWebSecurity
 @EnableMethodSecurity// phan quyen tren method
 public class SecurityConfig {
-    private final String[] PUBLIC_ENDPOINT = {"users", "/auth/token", "/auth/introspect"};
+    private final String[] PUBLIC_ENDPOINT = {"users", "/auth/token", "/auth/introspect", "/auth/logout","/auth/refresh"};
 
-    @Value("${signer.key}")
-    private String signerKey;
+    @Autowired
+
+    private CustomeJwtDecoder customeJwtDecoder;
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -38,32 +41,33 @@ public class SecurityConfig {
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwtConfig -> jwtConfig
-                        .decoder(jwtDecoder())
+                        .decoder(customeJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-               .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
         httpSecurity.csrf(http -> http.disable());
         return httpSecurity.build();
     }
-// TOKEN LỚN HƠN 4KB SE ISSUE
+
+    // TOKEN LỚN HƠN 4KB SE ISSUE
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter .setAuthorityPrefix("");
-             //   .setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        //   .setAuthorityPrefix("ROLE_");
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
 
         return jwtAuthenticationConverter;
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
+//    @Bean
+//    public JwtDecoder jwtDecoder() {
+//        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
+//        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
+//                .macAlgorithm(MacAlgorithm.HS512)
+//                .build();
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
