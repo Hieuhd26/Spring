@@ -41,7 +41,7 @@ public class UserService {
         this.roleRepository=roleRepository;
     }
 
-    public User createUser(UserCreationRequest request) {
+    public UserResponse createUser(UserCreationRequest request) {
 
         if (userRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.USER_EXISTED);
@@ -52,8 +52,8 @@ public class UserService {
         roles.add(Role.USER.name());
  //       user.setRoles(roles);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        userRepository.save(user);
-        return user;
+        //userRepository.save(user);
+        return userMapper.toUserResponse( userRepository.save(user));
 
     }
 
